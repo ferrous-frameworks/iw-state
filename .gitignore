@@ -1,0 +1,11 @@
+.idea/
+node_modules/
+dist/node_modules/
+
+src/**/*.js
+src/**/*.js.map
+
+results.txt
+
+npm-debug.log
+.DS_Store
