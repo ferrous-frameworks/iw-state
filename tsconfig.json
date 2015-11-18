@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"sourceMap": true
+	},
+	"files": [
+		"./src/index.ts",
+		"./src/state-worker.d.ts",
+		"./src/state-worker/IStateWorkerOpts.ts",
+		"./src/state-worker/StateWorker.test.ts",
+		"./src/state-worker/StateWorker.ts",
+		"./src/typings/master.d.ts",
+		"./src/typings/tsd/assertion-error/assertion-error.d.ts",
+		"./src/typings/tsd/chai/chai.d.ts",
+		"./src/typings/tsd/mocha/mocha.d.ts",
+		"./src/typings/tsd/tsd.d.ts",
+		"./src/typings/tsd/validator/validator.d.ts"
+	]
+}
