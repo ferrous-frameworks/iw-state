@@ -1,26 +1,41 @@
 
 ///<reference path='../typings/master.d.ts' />
 
-import chai = require('chai');
-var expect = chai.expect;
-
 import async = require('async');
 import _ = require('lodash');
+import chai = require('chai');
+var expect = chai.expect;
 
 import ironworks = require('ironworks');
 
 import IService = ironworks.service.IService;
 import Service = ironworks.service.Service;
+import EnvironmentWorker = ironworks.workers.EnvironmentWorker;
 
-var s: IService;
+import StateWorker = require('./StateWorker');
 
 describe('state-worker', () => {
     beforeEach((done) => {
-        s = new Service('test-service');
-        s.info('ready', () => {
-            done();
-        });
-        s.start();
+        new Service('test-service')
+
+            .use(new ironworks.workers.HttpServerWorker({
+                apiRoute: 'api',
+                port: 9967
+            }))
+
+            .use(new EnvironmentWorker('test', {
+                genericConnections: [{
+                    name: 'test-redis-service',
+                    host: '127.0.0.1',
+                    port: '6379',
+                    type: 'redis'
+                }]
+            }))
+            .use(new StateWorker())
+            .start()
+            .info('ready', () => {
+                done();
+            });
     });
 
     it("should ...", (done) => {
