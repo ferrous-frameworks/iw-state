@@ -23,7 +23,8 @@
   },
   "dependencies": {
     "async": "^1.4.0",
+    "lodash": "^3.10.0",
     "ironworks": "git+ssh://git@oses.homedepot.com:thdsal/ironworks.git",
-    "lodash": "^3.10.0"
+    "redis-worker": "git+ssh://git@oses.homedepot.com:thdsal/iw-redis.git"
   }
 }
