@@ -8,6 +8,7 @@ import redisWorker = require('redis-worker');
 import IRedisWorkerOpts = redisWorker.IRedisWorkerOpts;
 
 interface IStateWorkerOpts extends IWorkerChildOpts {
+    redisChannelPrefix?: string;
     redis?: IRedisWorkerOpts;
 }
 

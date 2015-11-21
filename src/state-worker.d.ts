@@ -7,7 +7,13 @@ declare module "state-worker" {
     import Worker = ironworks.workers.Worker;
     import IWorkerChildOpts = ironworks.options.IWorkerChildOpts;
 
-    export interface IStateWorkerOpts extends IWorkerChildOpts {}
+    import redisWorker = require('redis-worker');
+    import IRedisWorkerOpts = redisWorker.IRedisWorkerOpts;
+
+    export interface IStateWorkerOpts extends IWorkerChildOpts {
+        redisChannelPrefix?: string;
+        redis?: IRedisWorkerOpts;
+    }
 
     export class StateWWorker extends Worker implements IWorker {
         constructor(opts?: IStateWorkerOpts);

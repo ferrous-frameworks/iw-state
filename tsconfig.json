@@ -6,6 +6,7 @@
 	"files": [
 		"./src/index.ts",
 		"./src/state-worker.d.ts",
+		"./src/state-worker/IState.ts",
 		"./src/state-worker/IStateWorkerOpts.ts",
 		"./src/state-worker/StateWorker.test.ts",
 		"./src/state-worker/StateWorker.ts",
