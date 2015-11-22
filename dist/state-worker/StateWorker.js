@@ -12,14 +12,13 @@ var RedisWorker = redisWorker.RedisWorker;
 var StateWorker = (function (_super) {
     __extends(StateWorker, _super);
     function StateWorker(opts) {
-        var name = 'iw-state';
         var defOpts = {
-            redisChannelPrefix: name
+            redisChannelPrefix: 'iw-worker-state'
         };
         _super.call(this, _.isUndefined(opts) ? defOpts.redis : opts.redis);
         this.opts = this.opts.beAdoptedBy(defOpts, 'redis');
         this.opts.merge(opts);
-        this.me.name = name;
+        this.me.name = 'iw-state';
         this.redisChannelPrefix = this.opts.get('redisChannelPrefix');
     }
     StateWorker.prototype.init = function (cb) {
@@ -32,7 +31,9 @@ var StateWorker = (function (_super) {
                 _.each(parentListeners, function (l) {
                     l.annotation.internal = true;
                 });
-                _this.verify('monitor', function (key, cb, anno, emit) {
+                _this.annotate({
+                    internal: true
+                }).verify('monitor', function (key, cb, anno, emit) {
                     var channel = _this.getChannel(emit, key);
                     async.waterfall([
                         function (cb) {
@@ -55,7 +56,18 @@ var StateWorker = (function (_super) {
                         cb(e);
                     });
                 });
-                _this.verify('save', function (state, cb, anno, emit) {
+                _this.annotate({
+                    internal: true
+                }).verify('unmonitor', function (key, cb, anno, emit) {
+                    var channel = _this.getChannel(emit, key);
+                    _this.removeAllListeners('message-' + channel);
+                    _this.request('unsubscribe', channel, function (e) {
+                        cb(e);
+                    });
+                });
+                _this.annotate({
+                    internal: true
+                }).verify('save', function (state, cb, anno, emit) {
                     var channel = _this.getChannel(emit, state.key);
                     async.waterfall([
                         function (cb) {
@@ -88,6 +100,28 @@ var StateWorker = (function (_super) {
                         cb(e);
                     });
                 });
+                _this.annotate({
+                    internal: true
+                }).verify('delete', function (key, cb, anno, emit) {
+                    var channel = _this.getChannel(emit, key);
+                    async.waterfall([
+                        function (cb) {
+                            _this.request('del', channel, function (e) {
+                                cb(e);
+                            });
+                        },
+                        function (cb) {
+                            _this.request('publish', {
+                                channel: channel,
+                                value: null
+                            }, function (e) {
+                                cb(e);
+                            });
+                        }
+                    ], function (e) {
+                        cb(e);
+                    });
+                });
                 if (!_.isUndefined(cb)) {
                     cb(e);
                 }
@@ -102,11 +136,11 @@ var StateWorker = (function (_super) {
     };
     StateWorker.prototype.getChannel = function (emit, key) {
         var sections = [
-            _.trimRight(this.redisChannelPrefix, '-'),
+            _.trimRight(this.redisChannelPrefix, ':'),
             emit.emitter.name,
             key
         ];
-        return sections.join('~');
+        return sections.join(':');
     };
     return StateWorker;
 })(RedisWorker);

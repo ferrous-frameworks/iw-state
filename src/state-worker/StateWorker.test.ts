@@ -26,12 +26,6 @@ var s: IService;
 describe('state-worker', () => {
     beforeEach((done) => {
         s = new Service('test-service')
-
-            .use(new ironworks.workers.HttpServerWorker({
-                apiRoute: 'api',
-                port: 9967
-            }))
-
             .use(new EnvironmentWorker('test', {
                 genericConnections: [{
                     name: 'test-redis-service',
@@ -48,7 +42,7 @@ describe('state-worker', () => {
         }).start();
     });
 
-    it("should ...", (done) => {
+    it("should be able to save and monitor worker state keys", (done) => {
         var key = 'test-state-key';
         s.info<any>('state-update-' + key, (state) => {
             expect(state.some).to.be.equal(test.some);
@@ -61,7 +55,7 @@ describe('state-worker', () => {
                     value: test
                 }, (e) => {
                     cb(e);
-                })
+                });
             },
             (cb) => {
                 s.check<string>('iw-state.monitor', key, (e) => {
@@ -70,6 +64,75 @@ describe('state-worker', () => {
             }
         ], (e) => {
             expect(e).to.be.null;
+        });
+    });
+
+    it("should be able to unmonitor worker state keys", (done) => {
+        var key = 'test-state-key';
+        async.waterfall([
+            (cb) => {
+                s.check<IState>('iw-state.save', {
+                    key: key,
+                    value: test
+                }, (e) => {
+                    cb(e);
+                });
+            },
+            (cb) => {
+                s.check<string>('iw-state.monitor', key, (e) => {
+                    cb(e);
+                });
+            },
+            (cb) => {
+                s.info<any>('state-update-' + key, (state) => {
+                    throw new Error("state-update shouldn't have been called because it was unmonitored");
+                }).check<string>('iw-state.unmonitor', key, (e) => {
+                    cb(e);
+                });
+            },
+            (cb) => {
+                s.check<IState>('iw-state.save', {
+                    key: key,
+                    value: test
+                }, (e) => {
+                    setTimeout(() => {
+                        cb(e);
+                    }, 100);
+                });
+            }
+        ], (e) => {
+            expect(e).to.be.null;
+            done();
+        });
+    });
+
+    it("should be able to delete worker state keys", (done) => {
+        var key = 'test-state-key';
+        async.waterfall([
+            (cb) => {
+                s.check<IState>('iw-state.save', {
+                    key: key,
+                    value: test
+                }, (e) => {
+                    cb(e);
+                });
+            },
+            (cb) => {
+                s.check<string>('iw-state.monitor', key, (e) => {
+                    cb(e);
+                });
+            },
+            (cb) => {
+                s.info<any>('state-update-' + key, (state) => {
+                    expect(state).to.be.null;
+                    cb(null);
+                }).check<string>('iw-state.delete', key, (e) => {
+                    expect(e).to.be.null;
+                });
+            }
+        ], (e) => {
+            expect(e).to.be.null;
+            done();
         });
     });
 

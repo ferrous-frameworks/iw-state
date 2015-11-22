@@ -24,14 +24,13 @@ class StateWorker extends RedisWorker implements IWorker {
     private redisChannelPrefix: string;
 
     constructor(opts?: IStateWorkerOpts) {
-        var name = 'iw-state';
         var defOpts: IStateWorkerOpts = {
-            redisChannelPrefix: name
+            redisChannelPrefix: 'iw-worker-state'
         };
         super(_.isUndefined(opts) ? defOpts.redis : opts.redis);
         this.opts = this.opts.beAdoptedBy(defOpts, 'redis');
         this.opts.merge(opts);
-        this.me.name = name;
+        this.me.name = 'iw-state';
         this.redisChannelPrefix = this.opts.get<string>('redisChannelPrefix');
     }
 
@@ -44,7 +43,9 @@ class StateWorker extends RedisWorker implements IWorker {
                 _.each(parentListeners, (l) => {
                     l.annotation.internal = true;
                 });
-                this.verify<string>('monitor', (key, cb, anno, emit) => {
+                this.annotate({
+                    internal: true
+                }).verify<string>('monitor', (key, cb, anno, emit) => {
                     var channel = this.getChannel(emit, key);
                     async.waterfall([
                         (cb) => {
@@ -67,7 +68,18 @@ class StateWorker extends RedisWorker implements IWorker {
                         cb(e)
                     });
                 });
-                this.verify<IState>('save', (state, cb, anno, emit) => {
+                this.annotate({
+                    internal: true
+                }).verify<string>('unmonitor', (key, cb, anno, emit) => {
+                    var channel = this.getChannel(emit, key);
+                    this.removeAllListeners('message-' + channel);
+                    this.request<string, string>('unsubscribe', channel, (e) => {
+                        cb(e);
+                    });
+                });
+                this.annotate({
+                    internal: true
+                }).verify<IState>('save', (state, cb, anno, emit) => {
                     var channel = this.getChannel(emit, state.key);
                     async.waterfall([
                         (cb) => {
@@ -100,6 +112,28 @@ class StateWorker extends RedisWorker implements IWorker {
                         cb(e);
                     });
                 });
+                this.annotate({
+                    internal: true
+                }).verify<string>('delete', (key, cb, anno, emit) => {
+                    var channel = this.getChannel(emit, key);
+                    async.waterfall([
+                        (cb) => {
+                            this.request<string, number>('del', channel, (e) => {
+                                cb(e);
+                            });
+                        },
+                        (cb) => {
+                            this.request<IPublish, string>('publish', {
+                                channel: channel,
+                                value: null
+                            }, (e) => {
+                                cb(e);
+                            });
+                        }
+                    ], (e) => {
+                        cb(e);
+                    });
+                });
                 if (!_.isUndefined(cb)) {
                     cb(e);
                 }
@@ -115,11 +149,11 @@ class StateWorker extends RedisWorker implements IWorker {
 
     private getChannel(emit: ICommEmitData, key: string): string {
         var sections = [
-            _.trimRight(this.redisChannelPrefix, '-'),
+            _.trimRight(this.redisChannelPrefix, ':'),
             emit.emitter.name,
             key
         ];
-        return sections.join('~');
+        return sections.join(':');
     }
 }
 
