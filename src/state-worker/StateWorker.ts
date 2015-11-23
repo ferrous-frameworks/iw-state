@@ -37,12 +37,6 @@ class StateWorker extends RedisWorker implements IWorker {
     public init(cb?): IWorker {
         return super.init((e) => {
             if (e === null) {
-                var parentListeners = _.filter(this.allCommListeners(), (l) => {
-                    return l.commEvent.worker === this.me.name;
-                });
-                _.each(parentListeners, (l) => {
-                    l.annotation.internal = true;
-                });
                 this.annotate({
                     internal: true
                 }).verify<string>('monitor', (key, cb, anno, emit) => {
