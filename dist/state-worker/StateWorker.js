@@ -25,12 +25,6 @@ var StateWorker = (function (_super) {
         var _this = this;
         return _super.prototype.init.call(this, function (e) {
             if (e === null) {
-                var parentListeners = _.filter(_this.allCommListeners(), function (l) {
-                    return l.commEvent.worker === _this.me.name;
-                });
-                _.each(parentListeners, function (l) {
-                    l.annotation.internal = true;
-                });
                 _this.annotate({
                     internal: true
                 }).verify('monitor', function (key, cb, anno, emit) {
