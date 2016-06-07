@@ -1,3 +1,4 @@
+"use strict";
 var w = require('./state-worker/StateWorker');
 module.exports = {
     StateWorker: w

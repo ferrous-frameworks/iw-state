@@ -1,4 +1,5 @@
-///<reference path='../typings/master.d.ts' />
+///<reference path='../typings/index.d.ts' />
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -6,7 +7,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var _ = require('lodash');
 var async = require('async');
-var redisWorker = require('redis-worker');
+var redisWorker = require('iw-redis');
 var RedisWorker = redisWorker.RedisWorker;
 var StateWorker = (function (_super) {
     __extends(StateWorker, _super);
@@ -136,6 +137,6 @@ var StateWorker = (function (_super) {
         return sections.join(':');
     };
     return StateWorker;
-})(RedisWorker);
+}(RedisWorker));
 module.exports = StateWorker;
 //# sourceMappingURL=StateWorker.js.map

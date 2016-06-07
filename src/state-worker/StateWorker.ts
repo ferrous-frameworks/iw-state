@@ -1,5 +1,5 @@
 
-///<reference path='../typings/master.d.ts' />
+///<reference path='../typings/index.d.ts' />
 
 import _ = require('lodash');
 import async = require('async');
@@ -11,7 +11,7 @@ import idHelper = ironworks.helpers.idHelper;
 import IWorker = ironworks.workers.IWorker;
 import ICommEmitData = ironworks.eventing.ICommEmitData;
 
-import redisWorker = require('redis-worker');
+import redisWorker = require('iw-redis');
 import RedisWorker = redisWorker.RedisWorker;
 import IPublish = redisWorker.IPublish;
 import ISubscriptionMessage = redisWorker.ISubscriptionMessage;
@@ -143,7 +143,7 @@ class StateWorker extends RedisWorker implements IWorker {
 
     private getChannel(emit: ICommEmitData, key: string): string {
         var sections = [
-            _.trimRight(this.redisChannelPrefix, ':'),
+            (<any>_).trimRight(this.redisChannelPrefix, ':'),
             emit.emitter.name,
             key
         ];

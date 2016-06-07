@@ -1,10 +1,10 @@
 
-///<reference path='../typings/master.d.ts' />
+///<reference path='../typings/index.d.ts' />
 
 import ironworks = require('ironworks');
 import IWorkerChildOpts = ironworks.options.IWorkerChildOpts;
 
-import redisWorker = require('redis-worker');
+import redisWorker = require('iw-redis');
 import IRedisWorkerOpts = redisWorker.IRedisWorkerOpts;
 
 interface IStateWorkerOpts extends IWorkerChildOpts {

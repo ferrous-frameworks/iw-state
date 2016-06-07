@@ -1,4 +1,6 @@
 
+/// <reference path='./typings/index.d.ts' />
+
 declare module "state-worker" {
 
     import ironworks = require('ironworks');
@@ -7,7 +9,7 @@ declare module "state-worker" {
     import Worker = ironworks.workers.Worker;
     import IWorkerChildOpts = ironworks.options.IWorkerChildOpts;
 
-    import redisWorker = require('redis-worker');
+    import redisWorker = require('iw-redis');
     import IRedisWorkerOpts = redisWorker.IRedisWorkerOpts;
 
     export interface IStateWorkerOpts extends IWorkerChildOpts {

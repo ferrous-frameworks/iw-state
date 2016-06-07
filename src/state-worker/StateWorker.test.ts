@@ -1,5 +1,5 @@
 
-///<reference path='../typings/master.d.ts' />
+///<reference path='../typings/index.d.ts' />
 
 import async = require('async');
 import _ = require('lodash');
