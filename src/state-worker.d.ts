@@ -11,6 +11,11 @@ declare module "iw-state" {
 
     import redisWorker = require('iw-redis');
     import IRedisWorkerOpts = redisWorker.IRedisWorkerOpts;
+    
+    export interface IState {
+        key: string;
+        value: any;
+    }
 
     export interface IStateWorkerOpts extends IWorkerChildOpts {
         redisChannelPrefix?: string;
