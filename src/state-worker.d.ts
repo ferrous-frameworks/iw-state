@@ -1,7 +1,7 @@
 
 /// <reference path='./typings/index.d.ts' />
 
-declare module "state-worker" {
+declare module "iw-state" {
 
     import ironworks = require('ironworks');
 
