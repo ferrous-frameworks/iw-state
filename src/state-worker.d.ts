@@ -17,7 +17,7 @@ declare module "iw-state" {
         redis?: IRedisWorkerOpts;
     }
 
-    export class StateWWorker extends Worker implements IWorker {
+    export class StateWorker extends Worker implements IWorker {
         constructor(opts?: IStateWorkerOpts);
     }
 }
